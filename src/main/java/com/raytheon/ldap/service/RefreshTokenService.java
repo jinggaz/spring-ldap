@@ -11,7 +11,7 @@ import com.raytheon.ldap.auth.LdapTokenUtil;
 import com.raytheon.ldap.auth.LdapUser;
 import com.raytheon.ldap.dto.ResultForm;
 import com.raytheon.ldap.entity.AuthenticateEntity;
-import com.raytheon.ldap.exceptioni.TokenRefreshException;
+import com.raytheon.ldap.exception.TokenRefreshException;
 import com.raytheon.ldap.repository.AuthenticateRepository;
 
 @Component

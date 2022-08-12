@@ -1,4 +1,4 @@
-package com.raytheon.ldap.exceptioni;
+package com.raytheon.ldap.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

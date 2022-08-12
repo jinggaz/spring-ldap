@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.raytheon.ldap.entity.AuthenticateEntity;
-import com.raytheon.ldap.exceptioni.TokenRefreshException;
+import com.raytheon.ldap.exception.TokenRefreshException;
 import com.raytheon.ldap.repository.AuthenticateRepository;
 
 import io.jsonwebtoken.ExpiredJwtException;
