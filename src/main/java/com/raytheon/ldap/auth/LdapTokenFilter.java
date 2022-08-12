@@ -30,8 +30,8 @@ public class LdapTokenFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 
 		final String token = ldapTokenUtil.parse(request);
-		if (token != null && ldapTokenUtil.validate(request, token)) {
-			final String email = ldapTokenUtil.extractEmail(token);
+		if (token != null && ldapTokenUtil.validateAccessToken(request, token)) {
+			final String email = ldapTokenUtil.extractEmailFromAccessToken(token);
 			final LdapUser user = (LdapUser) userService.loadUserByEmail(email);
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user,
 					null, user.getAuthorities());

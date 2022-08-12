@@ -1,7 +1,6 @@
 package com.raytheon.ldap.auth;
 
 import java.util.Date;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +35,40 @@ public class LdapTokenUtil {
 	@Autowired
 	private AuthenticateRepository authenticateRepository;
 
-	@Value("${jwt.secret}")
-	private String secret;
+	@Value("${jwt.access-token.validity-time}")
+	private int accessTokenValidityTime;
 
-	public String createToken(int validityTime, String email) {
-		return Jwts.builder().setId(email).setIssuedAt(new Date()).setExpiration(createExpireDate(validityTime))
-				.signWith(SignatureAlgorithm.HS512, secret).compact();
+	@Value("${jwt.access-token.secret}")
+	private String accessSecret;
+	
+	@Value("${jwt.refresh-token.validity-time}")
+	private int refreshTokenValidityTime;
+
+	@Value("${jwt.refresh-token.secret}")
+	private String refreshSecret;
+
+	public String createAccessToken(String email) {
+
+		System.out.println("---------- Access ------------");
+		System.out.println("Current time is " + new Date());
+		System.out.println("Expire time will be " + new Date((new Date()).getTime() + accessTokenValidityTime));
+		System.out.println("");
+
+		return Jwts.builder().setId(email).setIssuedAt(new Date())
+				.setExpiration(createExpireDate(accessTokenValidityTime))
+				.signWith(SignatureAlgorithm.HS512, accessSecret).compact();
+	}
+	
+	public String createRefreshToken(String email) {
+
+		System.out.println("---------- Refresh ------------");
+		System.out.println("Current time is " + new Date());
+		System.out.println("Expire time will be " + new Date((new Date()).getTime() + refreshTokenValidityTime));
+		System.out.println("");
+
+		return Jwts.builder().setId(email).setIssuedAt(new Date())
+				.setExpiration(createExpireDate(refreshTokenValidityTime))
+				.signWith(SignatureAlgorithm.HS512, refreshSecret).compact();
 	}
 
 	private Date createExpireDate(int validityTime) {
@@ -60,12 +87,12 @@ public class LdapTokenUtil {
 		return token;
 	}
 
-	public boolean validate(HttpServletRequest request, String token) {
+	public boolean validateAccessToken(HttpServletRequest request, String token) {
 
 		boolean isValid = false;
 
 		try {
-			Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
+			Jwts.parser().setSigningKey(accessSecret).parseClaimsJws(token);
 			isValid = true;
 		} catch (SignatureException e) {
 			request.setAttribute(ERR_MSG, ERR_SIG_MSG);
@@ -82,16 +109,22 @@ public class LdapTokenUtil {
 		return isValid;
 	}
 
-	public String extractEmail(String token) {
-
-		return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getId();
+	public String extractEmailFromAccessToken(String accessToken) {
+		return Jwts.parser().setSigningKey(accessSecret).parseClaimsJws(accessToken).getBody().getId();
 	}
 
-	public Date extractExpiration(String token) {
-
-		return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getExpiration();
+	public String extractEmailFromRefreshToken(String refreshToken) {
+		return Jwts.parser().setSigningKey(refreshSecret).parseClaimsJws(refreshToken).getBody().getId();
+	}
+	
+	public Date extractExpirationFromAccessToken(String accessToken) {
+		return Jwts.parser().setSigningKey(accessSecret).parseClaimsJws(accessToken).getBody().getExpiration();
 	}
 
+	public Date extractExpirationFromRefreshToken(String refreshToken) {
+		return Jwts.parser().setSigningKey(refreshSecret).parseClaimsJws(refreshToken).getBody().getExpiration();
+	}
+	
 	public AuthenticateEntity verifyTokenExpirationi(AuthenticateEntity authenticateEntity) {
 
 		if (authenticateEntity.getExpiryDate().compareTo(new Date()) < 0) {

@@ -33,12 +33,12 @@ public class UserController {
 	}
 
 	@GetMapping("/test")
-	public ResponseEntity<String> test() {
+	public ResponseEntity<String> test(@RequestHeader(value = "refresh_token", required = false) String refreshToken) {
 		return ResponseEntity.ok("Hello World!\n Test endpoint is protected by Spring Security.");
 	}
 
 	@PostMapping("/refreshtoken")
-	public ResponseEntity<ResultForm> refreshToken(@RequestHeader(value="refresh_token")String refreshToken) {
+	public ResponseEntity<ResultForm> refreshToken(@RequestHeader(value = "refresh_token") String refreshToken) {
 
 		final ResultForm resultForm = refreshTokenService.refreshToken(refreshToken);
 
