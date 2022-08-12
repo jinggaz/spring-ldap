@@ -4,9 +4,14 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
+import com.raytheon.ldap.entity.AuthenticateEntity;
+import com.raytheon.ldap.exceptioni.TokenRefreshException;
+import com.raytheon.ldap.repository.AuthenticateRepository;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -28,19 +33,19 @@ public class LdapTokenUtil {
 	private static final String ERR_UNS_MSG = "Not supported Token";
 	private static final String ERR_ILL_MSG = "Has incorrect variable Token.";
 
+	@Autowired
+	private AuthenticateRepository authenticateRepository;
+
 	@Value("${jwt.secret}")
 	private String secret;
 
-	@Value("${jwt.validity_time}")
-	private long validityTime;
-
-	public String create(String email) {
-
-		final long currentTime = System.currentTimeMillis();
-		final long expiredTime = currentTime + validityTime;
-
-		return Jwts.builder().setId(email).setIssuedAt(new Date(currentTime)).setExpiration(new Date(expiredTime))
+	public String createToken(int validityTime, String email) {
+		return Jwts.builder().setId(email).setIssuedAt(new Date()).setExpiration(createExpireDate(validityTime))
 				.signWith(SignatureAlgorithm.HS512, secret).compact();
+	}
+
+	private Date createExpireDate(int validityTime) {
+		return new Date((new Date()).getTime() + validityTime);
 	}
 
 	public String parse(HttpServletRequest request) {
@@ -80,6 +85,22 @@ public class LdapTokenUtil {
 	public String extractEmail(String token) {
 
 		return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getId();
+	}
+
+	public Date extractExpiration(String token) {
+
+		return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getExpiration();
+	}
+
+	public AuthenticateEntity verifyTokenExpirationi(AuthenticateEntity authenticateEntity) {
+
+		if (authenticateEntity.getExpiryDate().compareTo(new Date()) < 0) {
+			authenticateRepository.delete(authenticateEntity);
+			throw new TokenRefreshException(authenticateEntity.getRefreshToken(),
+					"Refresh token was expired. Please make a new signin request");
+		}
+
+		return authenticateEntity;
 	}
 
 }
