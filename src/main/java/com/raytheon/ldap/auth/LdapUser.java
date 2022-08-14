@@ -7,6 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class LdapUser implements UserDetails {
 
+	private static final long serialVersionUID = 492395929795162440L;
+
 	private String email;
 	private String name;
 	private Collection<? extends GrantedAuthority> authorities;
@@ -19,6 +21,10 @@ public class LdapUser implements UserDetails {
 
 	public String getEmail() {
 		return email;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public Collection<? extends GrantedAuthority> getAuthorities() {
