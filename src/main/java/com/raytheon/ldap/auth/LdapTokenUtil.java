@@ -40,7 +40,7 @@ public class LdapTokenUtil {
 
 	@Value("${jwt.access-token.secret}")
 	private String accessSecret;
-	
+
 	@Value("${jwt.refresh-token.validity-time}")
 	private int refreshTokenValidityTime;
 
@@ -48,24 +48,12 @@ public class LdapTokenUtil {
 	private String refreshSecret;
 
 	public String createAccessToken(String email) {
-
-		System.out.println("---------- Access ------------");
-		System.out.println("Current time is " + new Date());
-		System.out.println("Expire time will be " + new Date((new Date()).getTime() + accessTokenValidityTime));
-		System.out.println("");
-
 		return Jwts.builder().setId(email).setIssuedAt(new Date())
 				.setExpiration(createExpireDate(accessTokenValidityTime))
 				.signWith(SignatureAlgorithm.HS512, accessSecret).compact();
 	}
-	
+
 	public String createRefreshToken(String email) {
-
-		System.out.println("---------- Refresh ------------");
-		System.out.println("Current time is " + new Date());
-		System.out.println("Expire time will be " + new Date((new Date()).getTime() + refreshTokenValidityTime));
-		System.out.println("");
-
 		return Jwts.builder().setId(email).setIssuedAt(new Date())
 				.setExpiration(createExpireDate(refreshTokenValidityTime))
 				.signWith(SignatureAlgorithm.HS512, refreshSecret).compact();
@@ -76,7 +64,6 @@ public class LdapTokenUtil {
 	}
 
 	public String parse(HttpServletRequest request) {
-
 		final String tokenHeader = request.getHeader(HEADER_KEY);
 		String token = null;
 
@@ -113,10 +100,10 @@ public class LdapTokenUtil {
 		return Jwts.parser().setSigningKey(accessSecret).parseClaimsJws(accessToken).getBody().getId();
 	}
 
-	public String extractEmailFromRefreshToken(String refreshToken) {
-		return Jwts.parser().setSigningKey(refreshSecret).parseClaimsJws(refreshToken).getBody().getId();
+	public String extractEmailFromRefreshToken(AuthenticateEntity authenticateEntity) {
+		return Jwts.parser().setSigningKey(refreshSecret).parseClaimsJws(authenticateEntity.getRefreshToken()).getBody().getId();
 	}
-	
+
 	public Date extractExpirationFromAccessToken(String accessToken) {
 		return Jwts.parser().setSigningKey(accessSecret).parseClaimsJws(accessToken).getBody().getExpiration();
 	}
@@ -124,10 +111,10 @@ public class LdapTokenUtil {
 	public Date extractExpirationFromRefreshToken(String refreshToken) {
 		return Jwts.parser().setSigningKey(refreshSecret).parseClaimsJws(refreshToken).getBody().getExpiration();
 	}
-	
-	public AuthenticateEntity verifyTokenExpirationi(AuthenticateEntity authenticateEntity) {
 
-		if (authenticateEntity.getExpiryDate().compareTo(new Date()) < 0) {
+	public AuthenticateEntity verifyTokenExpirationi(AuthenticateEntity authenticateEntity) {
+		final Date expiryDate = extractExpirationFromRefreshToken(authenticateEntity.getRefreshToken());
+		if (expiryDate.compareTo(new Date()) < 0) {
 			authenticateRepository.delete(authenticateEntity);
 			throw new TokenRefreshException(authenticateEntity.getRefreshToken(),
 					"Refresh token was expired. Please make a new signin request");

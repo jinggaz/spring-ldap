@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.raytheon.ldap.dto.LoginForm;
+import com.raytheon.ldap.dto.RefreshTokenRequest;
 import com.raytheon.ldap.dto.ResultForm;
 import com.raytheon.ldap.service.RefreshTokenService;
 import com.raytheon.ldap.service.UserService;
@@ -38,11 +39,12 @@ public class UserController {
 	}
 
 	@PostMapping("/refreshtoken")
-	public ResponseEntity<ResultForm> refreshToken(@RequestHeader(value = "refresh_token") String refreshToken) {
+	public ResponseEntity<ResultForm> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
 
-		final ResultForm resultForm = refreshTokenService.refreshToken(refreshToken);
+		final ResultForm resultForm = refreshTokenService.refreshToken(refreshTokenRequest.getRefreshToken());
 
 		return ResponseEntity.ok(resultForm);
 
 	}
+
 }

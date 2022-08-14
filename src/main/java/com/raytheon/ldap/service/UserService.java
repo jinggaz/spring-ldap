@@ -106,13 +106,12 @@ public class UserService {
 		final String accessToken = ldapTokenUtil.createAccessToken(user.getEmail());
 		final String refreshToken = ldapTokenUtil.createRefreshToken(user.getEmail());
 
-		Optional<AuthenticateEntity> authenticateEntity = authenticateRepository.findByEmail(user.getEmail());
+		Optional<AuthenticateEntity> authenticateEntity = authenticateRepository.findByRefreshToken(refreshToken);
 		if (authenticateEntity.isPresent()) {
 			authenticateEntity.get().changeToken(refreshToken);
 			authenticateRepository.save(authenticateEntity.get());
 		} else {
-			authenticateRepository.save(AuthenticateEntity.createEntity(refreshToken, user.getEmail(),
-					ldapTokenUtil.extractExpirationFromRefreshToken(refreshToken)));
+			authenticateRepository.save(AuthenticateEntity.createEntity(refreshToken));
 		}
 
 		return new ResultForm(accessToken, refreshToken);

@@ -1,7 +1,5 @@
 package com.raytheon.ldap.entity;
 
-import java.util.Date;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -18,22 +16,16 @@ public class AuthenticateEntity {
 
 	private String refreshToken;
 
-	private String email;
-	
-	private Date expiryDate;
-
 	public AuthenticateEntity() {
 
 	}
 
-	private AuthenticateEntity(String refreshToken, String email, Date expiryDate) {
+	private AuthenticateEntity(String refreshToken) {
 		this.refreshToken = refreshToken;
-		this.email = email;
-		this.expiryDate = expiryDate;
 	}
 
-	public static AuthenticateEntity createEntity(String refreshToken, String email, Date expiryDate) {
-		return new AuthenticateEntity(refreshToken, email, expiryDate);
+	public static AuthenticateEntity createEntity(String refreshToken) {
+		return new AuthenticateEntity(refreshToken);
 	}
 
 	public Long getId() {
@@ -42,14 +34,6 @@ public class AuthenticateEntity {
 
 	public String getRefreshToken() {
 		return refreshToken;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public Date getExpiryDate() {
-		return expiryDate;
 	}
 
 	public void refreshUpdate(String refreshToken) {
