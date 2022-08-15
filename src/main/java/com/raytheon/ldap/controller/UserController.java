@@ -44,7 +44,6 @@ public class UserController {
 		final ResultForm resultForm = refreshTokenService.refreshToken(refreshTokenRequest.getRefreshToken());
 
 		return ResponseEntity.ok(resultForm);
-
 	}
 
 }

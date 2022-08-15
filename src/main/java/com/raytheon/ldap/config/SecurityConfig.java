@@ -1,6 +1,7 @@
 package com.raytheon.ldap.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,6 +26,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private LdapTokenFilter ldapTokenFilter;
 	
+	@Value("${ldap.role.people}")
+	private String people;
+
+	private static final String DN_PATTERNS = "uid={0},ou=people";
+	private static final String SEARCH_BASE = "ou=groups";
+	private static final String LDAP_URL = "ldap://localhost:8389/dc=springframework,dc=org";
+
 	private static final String[] AUTH_WHITELIST = { 
 			"/authenticate",
 			"/swagger-resources/**",
@@ -40,16 +48,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-
 		auth.authenticationProvider(ldapAuthenticationProvider);
-		
+
 		auth.ldapAuthentication()
-		.userDnPatterns("uid={0},ou=people")
-		.groupSearchBase("ou=groups")
-		.contextSource()
-			.url("ldap://localhost:8389/dc=springframework,dc=org")
-		.and()
-		.passwordCompare().passwordEncoder(new BCryptPasswordEncoder()).passwordAttribute("userPassword");
+			.userDnPatterns(DN_PATTERNS)
+			.groupSearchBase(SEARCH_BASE)
+			.contextSource()
+			.url(LDAP_URL)
+			.and()
+			.passwordCompare()
+			.passwordEncoder(new BCryptPasswordEncoder())
+			.passwordAttribute("userPassword");
 	}
 
 	@Override
@@ -63,7 +72,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		  	.csrf().disable()
 		  	.authorizeRequests()
 		  	.antMatchers("users/login").permitAll()
-		  	.antMatchers(HttpMethod.GET, "/users/test").hasRole("PEOPLE")
+		  	.antMatchers(HttpMethod.GET, "/users/test").hasRole(people)
 		  	.antMatchers("/users/refreshtoken").permitAll()
 		  	.and()
 		  	.sessionManagement()
