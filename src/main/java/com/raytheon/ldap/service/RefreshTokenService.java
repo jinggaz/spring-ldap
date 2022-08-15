@@ -20,7 +20,7 @@ public class RefreshTokenService {
 	public ResultForm refreshToken(String refreshToken) {
 
 		return authenticateRepository.findByRefreshToken(refreshToken)
-				.map(ldapTokenUtil::verifyTokenExpiration)
+				.map(ldapTokenUtil::verifyRefreshTokenExpiration)
 				.map(ldapTokenUtil::extractEmailFromRefreshToken)
 				.map(email -> {
 					final String accessToken = ldapTokenUtil.createAccessToken(email);

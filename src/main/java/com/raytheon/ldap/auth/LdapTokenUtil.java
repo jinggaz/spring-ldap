@@ -112,7 +112,7 @@ public class LdapTokenUtil {
 		return Jwts.parser().setSigningKey(refreshSecret).parseClaimsJws(refreshToken).getBody().getExpiration();
 	}
 
-	public AuthenticateEntity verifyTokenExpiration(AuthenticateEntity authenticateEntity) {
+	public AuthenticateEntity verifyRefreshTokenExpiration(AuthenticateEntity authenticateEntity) {
 		final Date expiryDate = extractExpirationFromRefreshToken(authenticateEntity.getRefreshToken());
 		if (expiryDate.compareTo(new Date()) < 0) {
 			authenticateRepository.delete(authenticateEntity);
