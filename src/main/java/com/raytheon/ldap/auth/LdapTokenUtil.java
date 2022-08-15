@@ -49,17 +49,17 @@ public class LdapTokenUtil {
 
 	public String createAccessToken(String email) {
 		return Jwts.builder().setId(email).setIssuedAt(new Date())
-				.setExpiration(createExpireDate(accessTokenValidityTime))
+				.setExpiration(createExpiryDate(accessTokenValidityTime))
 				.signWith(SignatureAlgorithm.HS512, accessSecret).compact();
 	}
 
 	public String createRefreshToken(String email) {
 		return Jwts.builder().setId(email).setIssuedAt(new Date())
-				.setExpiration(createExpireDate(refreshTokenValidityTime))
+				.setExpiration(createExpiryDate(refreshTokenValidityTime))
 				.signWith(SignatureAlgorithm.HS512, refreshSecret).compact();
 	}
 
-	private Date createExpireDate(int validityTime) {
+	private Date createExpiryDate(int validityTime) {
 		return new Date((new Date()).getTime() + validityTime);
 	}
 
@@ -112,7 +112,7 @@ public class LdapTokenUtil {
 		return Jwts.parser().setSigningKey(refreshSecret).parseClaimsJws(refreshToken).getBody().getExpiration();
 	}
 
-	public AuthenticateEntity verifyTokenExpirationi(AuthenticateEntity authenticateEntity) {
+	public AuthenticateEntity verifyTokenExpiration(AuthenticateEntity authenticateEntity) {
 		final Date expiryDate = extractExpirationFromRefreshToken(authenticateEntity.getRefreshToken());
 		if (expiryDate.compareTo(new Date()) < 0) {
 			authenticateRepository.delete(authenticateEntity);
