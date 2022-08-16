@@ -56,10 +56,10 @@ public class UserService {
 		List<LoginForm> user = ldapTemplate.search(ldapQuery, new AbstractContextMapper<LoginForm>() {
 			@Override
 			protected LoginForm doMapFromContext(DirContextOperations ctx) {
-				final String eamil = ctx.getStringAttribute(UID);
+				final String eamilAddress = ctx.getStringAttribute(UID);
 				final byte[] bytes = (byte[]) ctx.getObjectAttribute(USERPASSWORD);
 				final String password = new String(bytes);
-				return new LoginForm(email, password);
+				return new LoginForm(eamilAddress, password);
 			}
 
 		});
@@ -78,12 +78,12 @@ public class UserService {
 		List<LdapUser> user = ldapTemplate.search(ldapQuery, new AbstractContextMapper<LdapUser>() {
 			@Override
 			protected LdapUser doMapFromContext(DirContextOperations ctx) {
-				final String eamil = ctx.getStringAttribute(UID);
+				final String eamilAddress = ctx.getStringAttribute(UID);
 				final String name = ctx.getStringAttribute(CN);
 				List<GrantedAuthority> authorities = new ArrayList<>();
 				authorities.add(new SimpleGrantedAuthority(
 						ROLE_PREFIX + LdapUtils.getStringValue(ctx.getDn(), OU).toUpperCase()));
-				return new LdapUser(email, name, authorities);
+				return new LdapUser(eamilAddress, name, authorities);
 			}
 
 		});

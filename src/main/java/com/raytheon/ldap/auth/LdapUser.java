@@ -1,7 +1,7 @@
 package com.raytheon.ldap.auth;
 
+import java.util.ArrayList;
 import java.util.Collection;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -12,6 +12,10 @@ public class LdapUser implements UserDetails {
 	private String email;
 	private String name;
 	private Collection<? extends GrantedAuthority> authorities;
+
+	public LdapUser() {
+
+	}
 
 	public LdapUser(String email, String name, Collection<? extends GrantedAuthority> authorities) {
 		this.email = email;

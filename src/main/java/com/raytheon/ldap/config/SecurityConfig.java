@@ -52,7 +52,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 		auth.ldapAuthentication()
 			.userDnPatterns(DN_PATTERNS)
+			.userSearchBase("ou=people")
+			.userSearchFilter("uid={0}")
 			.groupSearchBase(SEARCH_BASE)
+			.groupSearchFilter("uniqueMember={0}")
 			.contextSource()
 			.url(LDAP_URL)
 			.and()

@@ -49,6 +49,6 @@ public class SwaggerConfig {
 	}
 
 	private ApiInfo apiInfo() {
-		return new ApiInfoBuilder().title("Raytheon LDAP Demo API").description("Swagger").build();
+		return new ApiInfoBuilder().title("LDAP Authentication Demo microservice").description("Swagger").build();
 	}
 }
