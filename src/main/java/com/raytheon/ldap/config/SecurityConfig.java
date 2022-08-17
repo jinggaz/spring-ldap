@@ -76,6 +76,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		  	.authorizeRequests()
 		  	.antMatchers("users/login").permitAll()
 		  	.antMatchers(HttpMethod.GET, "/users/test").hasRole(people)
+		  	.antMatchers(HttpMethod.GET, "/users/user/**").hasRole(people)
 		  	.antMatchers("/users/refreshtoken").permitAll()
 		  	.and()
 		  	.sessionManagement()
