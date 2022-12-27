@@ -21,12 +21,11 @@ public class LdapAuthenticationProvider implements AuthenticationProvider {
 		final String email = authentication.getName();
 		final String password = (String) authentication.getCredentials();
 		
-		final boolean isAuthenticated = userService.authenticate(email, password);
+		final LdapUser user = userService.authenticate(email, password);
 		
-		if (!isAuthenticated) {
+		if (user == null) {
 			throw new UnauthenticatedUserException();
 		} else {
-			LdapUser user = (LdapUser) userService.loadUserByEmail(email);
 			return new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 		}
 	}

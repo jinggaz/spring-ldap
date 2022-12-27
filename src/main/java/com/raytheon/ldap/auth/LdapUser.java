@@ -7,16 +7,26 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class LdapUser implements UserDetails {
 
+	private static final long serialVersionUID = 492395929795162440L;
+	
 	private String email;
-	private String name;
+	private String fullName;
+	private String password;
 	private Collection<? extends GrantedAuthority> authorities;
 
 	public LdapUser(String email, String name, Collection<? extends GrantedAuthority> authorities) {
 		this.email = email;
-		this.name = name;
+		this.fullName = name;
 		this.authorities = authorities;
 	}
 
+	public LdapUser(String email, String name, String password, Collection<? extends GrantedAuthority> authorities) {
+		this.email = email;
+		this.fullName = name;
+		this.password = password;
+		this.authorities = authorities;
+	}
+	
 	public String getEmail() {
 		return email;
 	}
@@ -27,7 +37,7 @@ public class LdapUser implements UserDetails {
 
 	@Override
 	public String getPassword() {
-		return null;
+		return password;
 	}
 
 	@Override
@@ -35,6 +45,10 @@ public class LdapUser implements UserDetails {
 		return email;
 	}
 
+	public String getfullName() {
+		return fullName;
+	}
+	
 	@Override
 	public boolean isAccountNonExpired() {
 		return false;
